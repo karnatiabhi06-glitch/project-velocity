@@ -1,4 +1,5 @@
 from deep_sort_realtime.deepsort_tracker import DeepSort
+import numpy as np
 
 
 class DeepSortTracker:
@@ -7,11 +8,13 @@ class DeepSortTracker:
         # can fail on some cloud environments due to optional packaging deps
         # (e.g. pkg_resources/setuptools). Fall back to embedder=None to keep
         # tracking working without crashing WebRTC startup.
+        self._manual_embeds = False
         try:
             self.tracker = DeepSort(max_age=max_age)
         except ModuleNotFoundError as e:
             if e.name == "pkg_resources":
                 self.tracker = DeepSort(max_age=max_age, embedder=None)
+                self._manual_embeds = True
             else:
                 raise
 
@@ -28,7 +31,13 @@ class DeepSortTracker:
             # bbox: (x, y, w, h) which is [left, top, w, h]
             formatted_dets.append((bbox, conf, cls_name))
             
-        tracks = self.tracker.update_tracks(formatted_dets, frame=frame)
+        if self._manual_embeds:
+            # When embedder=None is used, deep_sort_realtime requires external
+            # embeddings on every update call.
+            embeds = [np.zeros((128,), dtype=np.float32) for _ in formatted_dets]
+            tracks = self.tracker.update_tracks(formatted_dets, embeds=embeds)
+        else:
+            tracks = self.tracker.update_tracks(formatted_dets, frame=frame)
         
         objects = {} # Format: {ID: (centroid_x, centroid_y)} for compatibility
         # We also want bbox for visualization, so we might need to return more info
