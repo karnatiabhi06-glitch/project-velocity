@@ -1,0 +1,83 @@
+/* Global Font */
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&display=swap');
+
+html, body, [class*="css"] {
+    font-family: 'Roboto Mono', monospace;
+}
+
+/* 
+   THEME CONSUMER CSS
+   This file now relies EXCLUSIVELY on CSS variables defined in app.py
+   --bg-color, --text-color, --input-bg, --sidebar-bg, --border-color
+*/
+
+/* Main App Background Override */
+.stApp {
+    background-color: transparent !important; /* Managed by app.py/iframe */
+}
+
+/* Sidebar Styling */
+section[data-testid="stSidebar"] {
+    background-color: var(--sidebar-bg); 
+    border-right: 1px solid var(--border-color);
+}
+/* Sidebar Elements */
+section[data-testid="stSidebar"] p,
+section[data-testid="stSidebar"] span,
+section[data-testid="stSidebar"] label {
+    color: var(--text-color) !important;
+}
+
+/* Cards / Metrics Styling */
+div[data-testid="stMetric"] {
+    background-color: var(--input-bg); /* Use input bg for cards */
+    padding: 15px;
+    border-radius: 10px;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+div[data-testid="stMetricLabel"] {
+    color: var(--text-color) !important;
+    opacity: 0.8;
+}
+
+div[data-testid="stMetricValue"] {
+    color: rgba(2, 255, 171, 1) !important; /* Green/Cyan Neon - Keep accent color static or make var */
+    /* Or use var(--text-color) if users want monotone */
+}
+
+/* Alert Container */
+.alert-box {
+    background-color: rgba(220, 38, 38, 0.1);
+    border-left: 5px solid #dc2626;
+    padding: 10px;
+    margin-bottom: 10px;
+    color: #fca5a5; /* Keep hardcoded for danger? Or use vars? Keep for now */
+}
+
+/* Custom Headers */
+h1, h2, h3, h4, h5, h6 {
+    color: var(--text-color) !important;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+/* WebRTC Video Container */
+iframe {
+    /* Only apply border to video iframes, not the background one */
+    /* We can distinguish by not matching the background style */
+}
+/* Use :not selector if possible, or target streamlit generic iframes */
+div[data-testid="stVideo"] iframe {
+    border: 2px solid #37ff00ff; 
+    border-radius: 8px;
+    box-shadow: 0 0 15px rgba(59, 130, 246, 0.5);
+}
+
+/* Inputs generic override if app.py didn't catch them */
+textarea, select {
+   background-color: var(--input-bg) !important;
+   color: var(--input-text) !important;
+   border-color: var(--border-color) !important;
+}
