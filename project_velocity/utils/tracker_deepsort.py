@@ -1,5 +1,9 @@
 from deep_sort_realtime.deepsort_tracker import DeepSort
-
+try:
+    import pkg_resources
+except ImportError:
+    import setuptools
+    pkg_resources = setuptools
 class DeepSortTracker:
     def __init__(self, max_age=30):
         self.tracker = DeepSort(max_age=max_age)
