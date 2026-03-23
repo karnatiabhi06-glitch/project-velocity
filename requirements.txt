@@ -7,3 +7,6 @@ aiortc
 ultralytics
 deep-sort-realtime
 easyocr
+setuptools
+torch
+torchvision
