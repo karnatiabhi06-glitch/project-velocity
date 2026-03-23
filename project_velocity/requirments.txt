@@ -1,0 +1,9 @@
+streamlit
+opencv-python-headless
+numpy
+av
+streamlit-webrtc
+aiortc
+ultralytics
+deep-sort-realtime
+easyocr
