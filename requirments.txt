@@ -1,5 +1,5 @@
-streamlit
-opencv-python-headless
+streamlit==1.32.0
+opencv-python-headless==4.9.0.80
 numpy
 av
 streamlit-webrtc
@@ -7,4 +7,3 @@ aiortc
 ultralytics
 deep-sort-realtime
 easyocr
-cv2
