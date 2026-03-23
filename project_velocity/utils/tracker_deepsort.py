@@ -1,12 +1,19 @@
 from deep_sort_realtime.deepsort_tracker import DeepSort
-try:
-    import pkg_resources
-except ImportError:
-    import setuptools
-    pkg_resources = setuptools
+
+
 class DeepSortTracker:
     def __init__(self, max_age=30):
-        self.tracker = DeepSort(max_age=max_age)
+        # deep_sort_realtime defaults to a PyTorch embedder ("mobilenet"), which
+        # can fail on some cloud environments due to optional packaging deps
+        # (e.g. pkg_resources/setuptools). Fall back to embedder=None to keep
+        # tracking working without crashing WebRTC startup.
+        try:
+            self.tracker = DeepSort(max_age=max_age)
+        except ModuleNotFoundError as e:
+            if e.name == "pkg_resources":
+                self.tracker = DeepSort(max_age=max_age, embedder=None)
+            else:
+                raise
 
     def update(self, detections, frame):
         """
