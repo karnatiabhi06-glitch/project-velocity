@@ -19,7 +19,11 @@ class YOLODetector:
         """
         # Optimization: Use imgsz=256 for faster inference if frame is small
         imgsz = 256 if frame.shape[1] <= 480 else 320
-        results = self.model(frame, verbose=False, conf=conf_threshold, classes=self.classes, imgsz=imgsz)
+        try:
+            results = self.model(frame, verbose=False, conf=conf_threshold, classes=self.classes, imgsz=imgsz)
+        except Exception:
+            # In cloud/webcam environments inference can occasionally fail on a frame.
+            return []
         
         detections = []
         for result in results:
@@ -27,6 +31,8 @@ class YOLODetector:
                 # Bounding Box (x1, y1, x2, y2)
                 x1, y1, x2, y2 = map(int, box.xyxy[0])
                 w, h = x2 - x1, y2 - y1
+                if w <= 0 or h <= 0:
+                    continue
                 
                 # Confidence
                 conf = float(box.conf[0])

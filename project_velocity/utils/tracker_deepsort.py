@@ -27,17 +27,34 @@ class DeepSortTracker:
         # Format for DeepSort: [([left, top, w, h], conf, class_name), ...]
         formatted_dets = []
         for det in detections:
-            bbox, cls_name, conf = det
-            # bbox: (x, y, w, h) which is [left, top, w, h]
-            formatted_dets.append((bbox, conf, cls_name))
+            try:
+                bbox, cls_name, conf = det
+                if bbox is None or len(bbox) != 4:
+                    continue
+                x, y, w, h = bbox
+                if w <= 0 or h <= 0:
+                    continue
+                # bbox: (x, y, w, h) which is [left, top, w, h]
+                formatted_dets.append(((int(x), int(y), int(w), int(h)), float(conf), str(cls_name)))
+            except Exception:
+                # Skip malformed detector output rather than crashing stream.
+                continue
+
+        # deep_sort_realtime may assert when input list is empty in some modes.
+        if not formatted_dets:
+            return {}
             
-        if self._manual_embeds:
-            # When embedder=None is used, deep_sort_realtime requires external
-            # embeddings on every update call.
-            embeds = [np.zeros((128,), dtype=np.float32) for _ in formatted_dets]
-            tracks = self.tracker.update_tracks(formatted_dets, embeds=embeds)
-        else:
-            tracks = self.tracker.update_tracks(formatted_dets, frame=frame)
+        try:
+            if self._manual_embeds:
+                # When embedder=None is used, deep_sort_realtime requires external
+                # embeddings on every update call.
+                embeds = [np.zeros((128,), dtype=np.float32) for _ in formatted_dets]
+                tracks = self.tracker.update_tracks(formatted_dets, embeds=embeds)
+            else:
+                tracks = self.tracker.update_tracks(formatted_dets, frame=frame)
+        except Exception:
+            # Keep the stream alive even if tracker backend fails for a frame.
+            return {}
         
         objects = {} # Format: {ID: (centroid_x, centroid_y)} for compatibility
         # We also want bbox for visualization, so we might need to return more info

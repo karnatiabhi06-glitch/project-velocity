@@ -194,10 +194,16 @@ class LVISSProcessor:
         # 1. Detection
         # Lower threshold at night to catch faint objects
         conf = 0.25 if self.night_mode else 0.45
-        detections = self.detector.detect(frame, conf_threshold=conf) 
+        try:
+            detections = self.detector.detect(frame, conf_threshold=conf)
+        except Exception:
+            detections = []
         
         # 2. Tracking
-        objects = self.tracker.update(detections, frame)
+        try:
+            objects = self.tracker.update(detections, frame)
+        except Exception:
+            objects = {}
 
         # 3. Logic
         current_sidebar_items = []
