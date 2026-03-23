@@ -346,7 +346,7 @@ def main():
         
         # Direct render (No container wrapper causing ghosting issues)
         if input_mode == "Webcam":
-            import pdb; pdb.set_trace()
+            # import pdb; pdb.set_trace()
             st.info("📡 Streaming Signal: LIVE")
             ctx = webrtc_streamer(
                 key="cam-stream",
